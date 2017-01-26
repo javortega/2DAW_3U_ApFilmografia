@@ -21,8 +21,14 @@
 	directoresConsultados.add(lista.getDirector());
 	session.setAttribute("directores",directoresConsultados);
  }else{
+ 	int contador = 0;
  	directoresConsultados=(ArrayList<Director>)session.getAttribute("directores");
- 	directoresConsultados.add(lista.getDirector());
+ 	for(Director director:directoresConsultados){
+ 	if(request.getParameter("nombre").equals(director.getNombre()))
+ 	contador++;
+ }
+ if(contador==0)
+ directoresConsultados.add(new Director(request.getParameter("nombre")));
  }
  %>
  <p>Estas son las películas de este director==> <%=lista.getTituloPeliculas() %></p>
