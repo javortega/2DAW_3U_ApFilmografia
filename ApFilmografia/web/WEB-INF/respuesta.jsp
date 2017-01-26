@@ -12,7 +12,7 @@
 </head>
 <body>
 <%
-	
+	//La lista de peliculas no debe ir en la sesion
 	ListaPeliculas lista=(ListaPeliculas)request.getAttribute("listaPeliculas");
 	ArrayList<Director>directoresConsultados=null;
 	//Pregunto por el atributo "directores" si es null creo el contenedor y añado el objeto Director

@@ -73,5 +73,6 @@ public class ValidaDirector extends HttpServlet {
 			System.out.println("Error en la conexión a base de datos.");
 		}
 		
+		
 	}
 }

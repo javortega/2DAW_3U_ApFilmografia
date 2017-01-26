@@ -50,8 +50,10 @@ public class BeanDao implements Dao{
 		boolean existe = false;
 		Statement st = null;
 		ResultSet rs = null;
-		
+		if(this.conexion!=null){
+			
 		try {
+			
 			st = this.conexion.createStatement();
 			rs = st.executeQuery("select director,titulo,fecha from peliculas where director='"+pNombre+"'");
 		if(rs.next()){
@@ -61,7 +63,7 @@ public class BeanDao implements Dao{
 		}
 		
 		
-		} catch (SQLException e) {
+			} catch (SQLException e) {
 			System.out.println("Error en la conexión a la base de datos");
 		}finally{
 			
@@ -76,8 +78,13 @@ public class BeanDao implements Dao{
 					
 					System.out.println("Error al cerrar la conexión");
 				}
+		}
+		
+		}else{
 			
 		}
+		
+		
 		
 		
 		return existe;
