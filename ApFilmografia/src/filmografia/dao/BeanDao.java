@@ -62,8 +62,21 @@ public class BeanDao implements Dao{
 		
 		
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error en la conexión a la base de datos");
+		}finally{
+			
+				try {
+					if(st!=null)
+					st.close();
+					
+					if(rs!=null)
+						rs.close();
+				
+				} catch (SQLException e) {
+					
+					System.out.println("Error al cerrar la conexión");
+				}
+			
 		}
 		
 		
@@ -86,8 +99,20 @@ public class BeanDao implements Dao{
 		
 		
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error en la conexión a la base de datos");
+		}finally{
+			try{
+				if(st!=null)
+					st.close();
+					
+					if(rs!=null)
+						rs.close();
+				
+			}catch(SQLException e){
+				System.out.println("Error al cerrar la conexión");
+			}
+			
+			
 		}
 
 		

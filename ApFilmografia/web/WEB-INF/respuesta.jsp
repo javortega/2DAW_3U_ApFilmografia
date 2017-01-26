@@ -15,12 +15,13 @@
 	
 	ListaPeliculas lista=(ListaPeliculas)request.getAttribute("listaPeliculas");
 	ArrayList<Director>directoresConsultados=null;
-	
+	//Pregunto por el atributo "directores" si es null creo el contenedor y añado el objeto Director
 	if(session.getAttribute("directores")==null){
 	directoresConsultados=new ArrayList<Director>();
 	directoresConsultados.add(lista.getDirector());
 	session.setAttribute("directores",directoresConsultados);
  }else{
+ 	
  	int contador = 0;
  	directoresConsultados=(ArrayList<Director>)session.getAttribute("directores");
  	for(Director director:directoresConsultados){

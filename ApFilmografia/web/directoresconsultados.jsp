@@ -14,11 +14,13 @@ String nombreDirector="";
 if(session.isNew()){
 %>
 <jsp:forward page="index.html"/>
+
 <%
 }else{
 if(session.getAttribute("directores")==null){
 %>
 <jsp:forward page="index.html"/>
+
 <%}
 ArrayList<Director>directores=(ArrayList<Director>)session.getAttribute("directores");
 

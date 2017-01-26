@@ -22,8 +22,6 @@ public class ValidaDirector extends HttpServlet {
 	private BeanDao beanDao;
 	
 	
-	
-	
 	public void init(ServletConfig configuracion) throws ServletException{
 		
 		super.init(configuracion);
@@ -72,8 +70,7 @@ public class ValidaDirector extends HttpServlet {
 			}
 				
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			System.out.println("Error en la conexión a base de datos.");
 		}
 		
 	}
