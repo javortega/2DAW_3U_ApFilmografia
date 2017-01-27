@@ -9,31 +9,35 @@ import javax.sql.DataSource;
 
 import filmografia.beans.Director;
 import filmografia.beans.Pelicula;
+import filmografia.vista.ListaDirectores;
 import filmografia.vista.ListaPeliculas;
 import filmografia.vista.excepciones.ExcepcionAp;
 import filmografia.vista.excepciones.ExcepcionDirectorNoEncontrado;
+import filmografia.vista.excepciones.ExcepcionErrorConexionBaseDatos;
 
 public class BeanDao implements Dao{
 
-	private DataSource ds;
+	
 	
 	private Connection conexion;
 	
 	private ListaPeliculas listPeliculas;
 	
+	private ListaDirectores listDirectores;
+	
 	private ExcepcionAp error;
 	
 
 	
-	public BeanDao(DataSource dataSource){
+	public BeanDao(){
 		
-		this.ds = dataSource;
+		
 		
 	}
 	
 	@Override
-	public Connection getConnection() throws SQLException {
-		this.conexion = this.ds.getConnection();
+	public Connection getConnection(DataSource ds) throws SQLException {
+		this.conexion = ds.getConnection();
 		return this.conexion;
 	}
 
@@ -41,7 +45,8 @@ public class BeanDao implements Dao{
 	public void close() throws SQLException {
 		if(this.conexion!=null)
 			this.conexion.close();
-		
+		else
+			this.conexion=null;
 	}
 
 	@Override
@@ -50,6 +55,7 @@ public class BeanDao implements Dao{
 		boolean existe = false;
 		Statement st = null;
 		ResultSet rs = null;
+		
 		if(this.conexion!=null){
 			
 		try {
@@ -81,7 +87,7 @@ public class BeanDao implements Dao{
 		}
 		
 		}else{
-			
+			this.error= new ExcepcionErrorConexionBaseDatos("Se ha perdido la conexión a la base de datos.");
 		}
 		
 		
@@ -96,18 +102,25 @@ public class BeanDao implements Dao{
 		Statement st = null;
 		ResultSet rs = null;
 		
+		//Debe de estar fuera del try sino devolveriamos un objeto nulo saltando un NullPointer en respuesta.jsp
+		this.listPeliculas=new ListaPeliculas();
+		
+		if(this.conexion!=null){
+		
 		try {
-			this.listPeliculas=new ListaPeliculas();
+				
 			st = this.conexion.createStatement();
 			rs = st.executeQuery("select director,titulo,fecha from peliculas where director='"+pNombre+"'");
-		while(rs.next()){
-			this.listPeliculas.addPeliculas(new Pelicula(new Director(rs.getString(1)),rs.getString(2),new java.util.Date(rs.getTimestamp(3).getTime())));
-		}
+			while(rs.next()){
+				this.listPeliculas.addPeliculas(new Pelicula(new Director(rs.getString(1)),rs.getString(2),new java.util.Date(rs.getTimestamp(3).getTime())));
+							}
 		
 		
-		} catch (SQLException e) {
+			} catch (SQLException e) {
 			System.out.println("Error en la conexión a la base de datos");
-		}finally{
+									}
+		
+	finally{
 			try{
 				if(st!=null)
 					st.close();
@@ -115,12 +128,17 @@ public class BeanDao implements Dao{
 					if(rs!=null)
 						rs.close();
 				
-			}catch(SQLException e){
+				}catch(SQLException e){
 				System.out.println("Error al cerrar la conexión");
+									}
 			}
 			
-			
-		}
+		
+		}else{
+			this.error = 
+			new ExcepcionErrorConexionBaseDatos("Se ha perdido la conexión a la base de datos.");
+			}
+		
 
 		
 		return this.listPeliculas;
@@ -129,4 +147,55 @@ public class BeanDao implements Dao{
     	 
     	 return this.error;
      }
-}
+     
+     public ListaDirectores getDirectores(){
+    	 
+    	 Statement st = null;
+    	 ResultSet rs =null;
+    	 
+ 		
+ 		//Debe de estar fuera del try sino devolveriamos un objeto nulo saltando un NullPointer en respuesta.jsp
+ 		this.listDirectores=new ListaDirectores();
+ 		
+ 		if(this.conexion!=null){
+ 		
+ 		try {
+ 				
+ 			st = this.conexion.createStatement();
+ 			rs = st.executeQuery("select DISTINCT director from peliculas;");
+ 			while(rs.next()){
+ 			this.listDirectores.addDirectores(new Director(rs.getString(1)));
+ 							}
+ 		
+ 		
+ 			} catch (SQLException e) {
+ 			System.out.println("Error en la conexión a la base de datos");
+ 									}
+ 		
+ 	finally{
+ 			try{
+ 				if(st!=null)
+ 					st.close();
+ 					
+ 					if(rs!=null)
+ 						rs.close();
+ 				
+ 				}catch(SQLException e){
+ 				System.out.println("Error al cerrar la conexión");
+ 									}
+ 			}
+ 			
+ 		
+ 		}else{
+ 			this.error = 
+ 			new ExcepcionErrorConexionBaseDatos("Se ha perdido la conexión a la base de datos.");
+ 			}
+ 		
+
+ 		
+ 		return this.listDirectores;
+ 	}
+    	 
+    	 
+     }
+

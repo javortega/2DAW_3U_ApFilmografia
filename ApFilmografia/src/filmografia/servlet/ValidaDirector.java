@@ -12,29 +12,34 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import filmografia.dao.BeanDao;
+import filmografia.vista.ListaDirectores;
 import filmografia.vista.ListaPeliculas;
 
 public class ValidaDirector extends HttpServlet {
 		
-	private BeanDao beanDao;
+	private DataSource ds;
 	
+	private HttpSession session;
 	
 	public void init(ServletConfig configuracion) throws ServletException{
 		
 		super.init(configuracion);
-	
+		ServletContext aplicacion=null;
 	try {
 		InitialContext inicioContexto = new InitialContext();
 		
-		  ServletContext aplicacion = configuracion.getServletContext();
-		  this.beanDao = new BeanDao((DataSource) inicioContexto.lookup(aplicacion.getInitParameter("datasource")));
+		  aplicacion = configuracion.getServletContext();
+		  this.ds = (DataSource) inicioContexto.lookup(aplicacion.getInitParameter("datasource"));
 		 
 	} catch (NamingException e) {
 		
 		System.out.println("Error en el método init.");
+		aplicacion.setInitParameter("apFuncionando", "false");
+		
 	}
 	
 	}
@@ -47,31 +52,67 @@ public class ValidaDirector extends HttpServlet {
 	protected void doPost(HttpServletRequest request,HttpServletResponse response) throws ServletException, IOException{
 		
 		String vista="";
+		String vistaError="";
+		ListaDirectores listDirectores;
+		this.session = request.getSession();
+		BeanDao beanDao = new BeanDao();
+		ServletContext aplicacion=request.getServletContext();
 		
 		try {
-			this.beanDao.getConnection();
-			
-			if(this.beanDao.existeDirector(request.getParameter("nombre"))){
-				
-				vista="WEB-INF/respuesta.jsp";
-				ListaPeliculas lista=this.beanDao.getPeliculas(request.getParameter("nombre"));
-				request.setAttribute("listaPeliculas", lista);
-				
-				this.beanDao.close();
+			if(this.session.getAttribute("listaCompletaDirectores")==null){
+				vista="index.jsp";
+				beanDao.getConnection(this.ds);
+				listDirectores=beanDao.getDirectores();
+				request.setAttribute("listaCompletaDirectores",listDirectores);
 				RequestDispatcher rd = request.getRequestDispatcher(vista);
-				rd.forward(request, response);
-				
-			}else{
-				vista="WEB-INF/error.jsp";
-				request.setAttribute("error", this.beanDao.getError());
-				this.beanDao.close();
-				RequestDispatcher rd = request.getRequestDispatcher(vista);
+				beanDao.close();
 				rd.forward(request, response);
 			}
 				
-		} catch (SQLException e) {
+				
+			
+				
+				
+			//Preguntamos primero si es null.Si es 
+		if(aplicacion.getInitParameter("apFuncionando")!=null){
+			
+				if(aplicacion.getInitParameter("apFuncionando").equals("false")){
+				vista="WEB-INF/aplicacionenmantenimiento.jsp";
+				request.setAttribute("error","Imposible utilizar la aplicación,inténtelo más tarde.");
+				RequestDispatcher rd = request.getRequestDispatcher(vista);
+				rd.forward(request, response);
+			
+				}
+		}else{
+				
+				
+				if(request.getParameter("accion")!=null){
+				vista="WEB-INF/"+request.getParameter("accion")+".jsp";
+				RequestDispatcher rd = request.getRequestDispatcher(vista);
+				rd.forward(request, response);
+				}
+				beanDao.getConnection(this.ds);	
+				if(beanDao.existeDirector(request.getParameter("directores"))){
+				
+				vista="WEB-INF/respuesta.jsp";
+				ListaPeliculas lista=beanDao.getPeliculas(request.getParameter("directores"));
+				request.setAttribute("listaPeliculas", lista);
+				
+				beanDao.close();
+				RequestDispatcher rd = request.getRequestDispatcher(vista);
+				rd.forward(request, response);
+				
+				}else{
+				vistaError="WEB-INF/error.jsp";
+				request.setAttribute("error", beanDao.getError());
+				beanDao.close();
+				RequestDispatcher rd = request.getRequestDispatcher(vistaError);
+				rd.forward(request, response);
+					}
+			}	
+				} catch (SQLException e) {
 			System.out.println("Error en la conexión a base de datos.");
-		}
+						}
 		
 		
 	}

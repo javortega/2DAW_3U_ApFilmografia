@@ -10,7 +10,7 @@ import filmografia.vista.ListaPeliculas;
 public interface Dao {
 	
 	
-	public Connection getConnection()throws SQLException;
+	public Connection getConnection(DataSource ds)throws SQLException;
 	
 	public void close()throws SQLException;
 	

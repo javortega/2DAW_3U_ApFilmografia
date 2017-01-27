@@ -13,4 +13,21 @@ public class Director {
 		
 		return this.nombre;
 	}
+	
+	
+	public int hashCode(){
+		
+		return this.nombre.hashCode();
+	}
+	
+	public boolean equals(Object obj){
+		  if (obj instanceof Director) {
+			    Director director = (Director)obj;
+			    return this.nombre.equals(director.nombre);
+			  } else {
+			    return false;
+			  }
+		
+		
+	}
 }

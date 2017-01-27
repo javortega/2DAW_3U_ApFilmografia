@@ -34,10 +34,13 @@ public class ListaPeliculas {
 		Director director=null;
 		for(Pelicula pelicula:this.listaPeliculas){
 		director =	pelicula.getDirector();
-		break;
+		
 		}
 		return director;
 	}
-	
+	public boolean isVacio(){
+		
+		return this.listaPeliculas.isEmpty();
+	}
 	
 }
