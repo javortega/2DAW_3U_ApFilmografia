@@ -7,6 +7,7 @@ public class ListaPeliculas {
 	
 	private ArrayList<Pelicula> listaPeliculas;
 	
+	
 	public ListaPeliculas(){
 		
 		this.listaPeliculas = new ArrayList<Pelicula>();
@@ -38,9 +39,16 @@ public class ListaPeliculas {
 		}
 		return director;
 	}
-	public boolean isVacio(){
+	public boolean getIsVacio(){
 		
 		return this.listaPeliculas.isEmpty();
 	}
+
+
+	public void setListaPeliculas(ArrayList<Pelicula> listaPeliculas) {
+		this.listaPeliculas = listaPeliculas;
+	}
+	
+	
 	
 }

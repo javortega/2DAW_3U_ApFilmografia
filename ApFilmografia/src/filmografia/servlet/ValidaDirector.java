@@ -59,6 +59,11 @@ public class ValidaDirector extends HttpServlet {
 		ServletContext aplicacion=request.getServletContext();
 		
 		try {
+			//Le paso al index.jsp todos los directores disponibles en la base de datos
+			//Pregunto si es null para saber que el usuario acaba de iniciar la aplicación
+			//ya que si quiere volver a consultar las películas de un director no se 
+			//vuelve a acceder a la bd sino que trabajamos con una variable de session.
+			
 			if(this.session.getAttribute("listaCompletaDirectores")==null){
 				vista="index.jsp";
 				beanDao.getConnection(this.ds);
@@ -73,7 +78,8 @@ public class ValidaDirector extends HttpServlet {
 			
 				
 				
-			//Preguntamos primero si es null.Si es 
+			//Si salta una excepción,buscando el ds ,la controlo aqui y mando al usr a 
+			//aplicacionmantenimiento.jsp sin posibilidad de seguir con la aplicación
 		if(aplicacion.getInitParameter("apFuncionando")!=null){
 			
 				if(aplicacion.getInitParameter("apFuncionando").equals("false")){
@@ -91,7 +97,8 @@ public class ValidaDirector extends HttpServlet {
 				RequestDispatcher rd = request.getRequestDispatcher(vista);
 				rd.forward(request, response);
 				}
-				beanDao.getConnection(this.ds);	
+				beanDao.getConnection(this.ds);
+				//Consulta innecesaria
 				if(beanDao.existeDirector(request.getParameter("directores"))){
 				
 				vista="WEB-INF/respuesta.jsp";

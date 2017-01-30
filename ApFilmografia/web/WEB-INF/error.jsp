@@ -11,11 +11,11 @@
 <body>
 <%
 	ExcepcionAp err = (ExcepcionAp) request.getAttribute("error");
-	
 %> 
 Se ha producido un error.<br>
 El mensaje de la excepción es: <%=err.getMensajeError()%> <br>
-<form action="index.html" method="get">
+
+<form action="index.jsp" method="post">
 
 <input type="submit" value="Inicio">
 </form>

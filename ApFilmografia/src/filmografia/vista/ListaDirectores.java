@@ -11,6 +11,8 @@ public class ListaDirectores {
 	private HashSet<Director>listaDirectores;
 	
 	
+	
+	
 	public ListaDirectores(){
 		
 		this.listaDirectores = new HashSet<Director>();
@@ -18,7 +20,7 @@ public class ListaDirectores {
 	
 	
 	
-	public void addDirectores(Director director){
+	public void addDirector(Director director){
 		
 		this.listaDirectores.add(director);
 	}
@@ -27,4 +29,6 @@ public class ListaDirectores {
 		
 		return this.listaDirectores.iterator();
 	}
+	
+
 }

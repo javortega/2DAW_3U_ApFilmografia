@@ -164,7 +164,7 @@ public class BeanDao implements Dao{
  			st = this.conexion.createStatement();
  			rs = st.executeQuery("select DISTINCT director from peliculas;");
  			while(rs.next()){
- 			this.listDirectores.addDirectores(new Director(rs.getString(1)));
+ 			this.listDirectores.addDirector(new Director(rs.getString(1)));
  							}
  		
  		
