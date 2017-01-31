@@ -68,7 +68,7 @@ public class ValidaDirector extends HttpServlet {
 			
 			//Si salta una excepción,buscando el ds ,la controlo aqui y mando al usr a 
 			//aplicacionmantenimiento.jsp sin posibilidad de seguir con la aplicación
-		if((boolean)aplicacion.getAttribute("apFuncionando")!=true){
+		if(!(boolean)aplicacion.getAttribute("apFuncionando")){
 			
 				
 				vista="WEB-INF/aplicacionenmantenimiento.jsp";
