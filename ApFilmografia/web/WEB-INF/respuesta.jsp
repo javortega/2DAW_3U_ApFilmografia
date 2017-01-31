@@ -34,8 +34,9 @@ listaDirectores.addDirector(listaPeliculas.getDirector());
 <p>Estas son las películas de este director==> <c:out value="${lista.tituloPeliculas }"/></p>
 </c:otherwise>
 </c:choose>
-  <form action="index.jsp">
+  <form action="validadirector">
  <input type="submit" value="Consultar de nuevo">
+ <input type="hidden" name="accion" value="index">
  </form>
  <form action="validadirector" method="post">
  <input type="submit" value="Finalizar">

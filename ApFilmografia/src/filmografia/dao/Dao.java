@@ -5,12 +5,13 @@ import java.sql.SQLException;
 
 import javax.sql.DataSource;
 
+import filmografia.vista.ListaDirectores;
 import filmografia.vista.ListaPeliculas;
 
 public interface Dao {
 	
 	
-	public Connection getConnection(DataSource ds)throws SQLException;
+	public Connection getConnection()throws SQLException;
 	
 	public void close()throws SQLException;
 	
@@ -19,5 +20,7 @@ public interface Dao {
 	
 	
 	public ListaPeliculas getPeliculas(String pNombre);
+	
+	public ListaDirectores getDirectores();
 	
 }

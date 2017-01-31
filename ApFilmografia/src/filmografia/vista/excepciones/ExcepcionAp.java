@@ -1,6 +1,6 @@
 package filmografia.vista.excepciones;
 
-public class ExcepcionAp extends Exception {
+public abstract class ExcepcionAp extends Exception {
 	protected String mensaje;
 	
 	

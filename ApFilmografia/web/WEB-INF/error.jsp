@@ -15,8 +15,8 @@
 Se ha producido un error.<br>
 El mensaje de la excepción es: <%=err.getMensajeError()%> <br>
 
-<form action="index.jsp" method="post">
-
+<form action="validadirector" method="post">
+<input type="hidden" value="index" name="accion">
 <input type="submit" value="Inicio">
 </form>
 </body>

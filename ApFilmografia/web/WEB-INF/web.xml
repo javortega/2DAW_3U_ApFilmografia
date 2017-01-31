@@ -8,10 +8,6 @@
     <param-name>datasource</param-name>
     <param-value>java:jboss/datasources/dscine</param-value>
     </context-param>
-     <context-param>
-      <param-name>acumulador</param-name>
-      <param-value>1</param-value>
-    </context-param>
     <servlet>
     <servlet-name>ValidaDirector</servlet-name>
     <servlet-class>filmografia.servlet.ValidaDirector</servlet-class>
@@ -19,7 +15,7 @@
     </servlet>
     <servlet-mapping>
     <servlet-name>ValidaDirector</servlet-name>
-    <url-pattern>/validadirector</url-pattern>
+    <url-pattern>/</url-pattern>
     </servlet-mapping>
     
 </web-app>

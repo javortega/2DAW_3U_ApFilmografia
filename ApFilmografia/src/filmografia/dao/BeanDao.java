@@ -27,17 +27,17 @@ public class BeanDao implements Dao{
 	
 	private ExcepcionAp error;
 	
-
+	private DataSource ds;
 	
-	public BeanDao(){
-		
+	public BeanDao(DataSource ds){
+		this.ds=ds;
 		
 		
 	}
 	
 	@Override
-	public Connection getConnection(DataSource ds) throws SQLException {
-		this.conexion = ds.getConnection();
+	public Connection getConnection() throws SQLException {
+		this.conexion = this.ds.getConnection();
 		return this.conexion;
 	}
 
@@ -51,15 +51,17 @@ public class BeanDao implements Dao{
 
 	@Override
 	public boolean existeDirector(String pNombre){
-		
+		boolean conexionOk=false;
 		boolean existe = false;
 		Statement st = null;
 		ResultSet rs = null;
 		
-		if(this.conexion!=null){
 			
 		try {
-			
+			if(this.conexion==null){
+				this.getConnection();
+				conexionOk=true;
+			}	
 			st = this.conexion.createStatement();
 			rs = st.executeQuery("select director,titulo,fecha from peliculas where director='"+pNombre+"'");
 		if(rs.next()){
@@ -68,10 +70,12 @@ public class BeanDao implements Dao{
 			this.error = new ExcepcionDirectorNoEncontrado("El director no se encuentra en la base de datos");
 		}
 		
-		
+		if(conexionOk)
+			this.close();
 			} catch (SQLException e) {
 			System.out.println("Error en la conexión a la base de datos");
-		}finally{
+			this.error= new ExcepcionErrorConexionBaseDatos("Se ha perdido la conexión a la base de datos.");
+			}finally{
 			
 				try {
 					if(st!=null)
@@ -86,39 +90,37 @@ public class BeanDao implements Dao{
 				}
 		}
 		
-		}else{
-			this.error= new ExcepcionErrorConexionBaseDatos("Se ha perdido la conexión a la base de datos.");
-		}
-		
-		
-		
-		
 		return existe;
 	}
 
 	@Override
 	public ListaPeliculas getPeliculas(String pNombre) {
-		
+		boolean conexionOk=false;
 		Statement st = null;
 		ResultSet rs = null;
 		
-		//Debe de estar fuera del try sino devolveriamos un objeto nulo saltando un NullPointer en respuesta.jsp
+		//Debe de estar fuera del try sino devolveríamos un objeto nulo saltando un NullPointer en respuesta.jsp
 		this.listPeliculas=new ListaPeliculas();
-		
-		if(this.conexion!=null){
-		
 		try {
-				
+		if(this.conexion==null){
+			this.getConnection();
+			conexionOk=true;
+		}
 			st = this.conexion.createStatement();
 			rs = st.executeQuery("select director,titulo,fecha from peliculas where director='"+pNombre+"'");
 			while(rs.next()){
 				this.listPeliculas.addPeliculas(new Pelicula(new Director(rs.getString(1)),rs.getString(2),new java.util.Date(rs.getTimestamp(3).getTime())));
 							}
-		
+		if(conexionOk){
+			this.close();
+		}
 		
 			} catch (SQLException e) {
 			System.out.println("Error en la conexión a la base de datos");
-									}
+			this.error = 
+					new ExcepcionErrorConexionBaseDatos("Se ha perdido la conexión a la base de datos.");						
+			
+			}
 		
 	finally{
 			try{
@@ -133,44 +135,41 @@ public class BeanDao implements Dao{
 									}
 			}
 			
-		
-		}else{
-			this.error = 
-			new ExcepcionErrorConexionBaseDatos("Se ha perdido la conexión a la base de datos.");
-			}
-		
-
-		
 		return this.listPeliculas;
 	}
-     public ExcepcionAp getError(){
+     
+	public ExcepcionAp getError(){
     	 
     	 return this.error;
      }
      
      public ListaDirectores getDirectores(){
-    	 
+    	 boolean conexionOk=false;
     	 Statement st = null;
     	 ResultSet rs =null;
     	 
  		
  		//Debe de estar fuera del try sino devolveriamos un objeto nulo saltando un NullPointer en respuesta.jsp
  		this.listDirectores=new ListaDirectores();
- 		
- 		if(this.conexion!=null){
- 		
  		try {
- 				
+ 		if(this.conexion==null){
+ 			this.getConnection();
+ 			conexionOk=true;
+ 		}
  			st = this.conexion.createStatement();
  			rs = st.executeQuery("select DISTINCT director from peliculas;");
  			while(rs.next()){
  			this.listDirectores.addDirector(new Director(rs.getString(1)));
  							}
  		
- 		
+ 		if(conexionOk)
+ 			this.close();
+ 			
  			} catch (SQLException e) {
  			System.out.println("Error en la conexión a la base de datos");
- 									}
+ 			this.error = 
+ 		 			new ExcepcionErrorConexionBaseDatos("Se ha perdido la conexión a la base de datos.");						
+ 				}
  		
  	finally{
  			try{
@@ -185,13 +184,6 @@ public class BeanDao implements Dao{
  									}
  			}
  			
- 		
- 		}else{
- 			this.error = 
- 			new ExcepcionErrorConexionBaseDatos("Se ha perdido la conexión a la base de datos.");
- 			}
- 		
-
  		
  		return this.listDirectores;
  	}

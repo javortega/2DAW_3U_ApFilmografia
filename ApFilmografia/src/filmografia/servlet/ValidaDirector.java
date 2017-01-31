@@ -23,7 +23,7 @@ public class ValidaDirector extends HttpServlet {
 		
 	private DataSource ds;
 	
-	private HttpSession session;
+	
 	
 	public void init(ServletConfig configuracion) throws ServletException{
 		
@@ -31,15 +31,21 @@ public class ValidaDirector extends HttpServlet {
 		ServletContext aplicacion=null;
 	try {
 		InitialContext inicioContexto = new InitialContext();
-		
+			
 		  aplicacion = configuracion.getServletContext();
+		  //setAttribute--> establece un parámetro en el contexto de aplicación.
+		  //para modificarlo debemos recurrir de nuevo a setAttribute porque este 
+		  //método si encuentra un parámetro con el mismo nombre cambiará su valor original
+		  //por el que le hayamos introducido.
+		  aplicacion.setAttribute("apFuncionando", true);
 		  this.ds = (DataSource) inicioContexto.lookup(aplicacion.getInitParameter("datasource"));
+		  
 		 
 	} catch (NamingException e) {
 		
 		System.out.println("Error en el método init.");
-		aplicacion.setInitParameter("apFuncionando", "false");
 		
+		aplicacion.setAttribute("apFuncionando", false);
 	}
 	
 	}
@@ -54,19 +60,36 @@ public class ValidaDirector extends HttpServlet {
 		String vista="";
 		String vistaError="";
 		ListaDirectores listDirectores;
-		this.session = request.getSession();
-		BeanDao beanDao = new BeanDao();
+		HttpSession session = request.getSession();
+		BeanDao beanDao = new BeanDao(this.ds);
 		ServletContext aplicacion=request.getServletContext();
 		
 		try {
+			
+			//Si salta una excepción,buscando el ds ,la controlo aqui y mando al usr a 
+			//aplicacionmantenimiento.jsp sin posibilidad de seguir con la aplicación
+		if((boolean)aplicacion.getAttribute("apFuncionando")!=true){
+			
+				
+				vista="WEB-INF/aplicacionenmantenimiento.jsp";
+				request.setAttribute("error","Imposible utilizar la aplicación,inténtelo más tarde.");
+				RequestDispatcher rd = request.getRequestDispatcher(vista);
+				rd.forward(request, response);
+			
+				
+		}
+			
+			
+			
+			
 			//Le paso al index.jsp todos los directores disponibles en la base de datos
 			//Pregunto si es null para saber que el usuario acaba de iniciar la aplicación
 			//ya que si quiere volver a consultar las películas de un director no se 
 			//vuelve a acceder a la bd sino que trabajamos con una variable de session.
 			
-			if(this.session.getAttribute("listaCompletaDirectores")==null){
-				vista="index.jsp";
-				beanDao.getConnection(this.ds);
+			if(session.getAttribute("listaCompletaDirectores")==null){
+				vista="WEB-INF/index.jsp";
+				beanDao.getConnection();
 				listDirectores=beanDao.getDirectores();
 				request.setAttribute("listaCompletaDirectores",listDirectores);
 				RequestDispatcher rd = request.getRequestDispatcher(vista);
@@ -75,29 +98,12 @@ public class ValidaDirector extends HttpServlet {
 			}
 				
 				
-			
-				
-				
-			//Si salta una excepción,buscando el ds ,la controlo aqui y mando al usr a 
-			//aplicacionmantenimiento.jsp sin posibilidad de seguir con la aplicación
-		if(aplicacion.getInitParameter("apFuncionando")!=null){
-			
-				if(aplicacion.getInitParameter("apFuncionando").equals("false")){
-				vista="WEB-INF/aplicacionenmantenimiento.jsp";
-				request.setAttribute("error","Imposible utilizar la aplicación,inténtelo más tarde.");
-				RequestDispatcher rd = request.getRequestDispatcher(vista);
-				rd.forward(request, response);
-			
-				}
-		}else{
-				
-				
-				if(request.getParameter("accion")!=null){
+			if(request.getParameter("accion")!=null){
 				vista="WEB-INF/"+request.getParameter("accion")+".jsp";
 				RequestDispatcher rd = request.getRequestDispatcher(vista);
 				rd.forward(request, response);
 				}
-				beanDao.getConnection(this.ds);
+				beanDao.getConnection();
 				//Consulta innecesaria
 				if(beanDao.existeDirector(request.getParameter("directores"))){
 				
@@ -116,7 +122,7 @@ public class ValidaDirector extends HttpServlet {
 				RequestDispatcher rd = request.getRequestDispatcher(vistaError);
 				rd.forward(request, response);
 					}
-			}	
+				
 				} catch (SQLException e) {
 			System.out.println("Error en la conexión a base de datos.");
 						}
